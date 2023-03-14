@@ -18,7 +18,14 @@ class Client(models.Model):
                           editable=False)
     full_name = models.CharField(verbose_name='Полное наименование', max_length=250,
                                   unique=True, null=True, blank=True)
-    INN = models.IntegerField(verbose_name='ИНН Физ/Юр лица',
+    INN = models.CharField(verbose_name='ИНН Физ/Юр лица', max_length=12,
                               unique=True, null=True, blank=True)
     status = models.CharField(verbose_name='Тип пользователя', max_length=50,
                               choices=USER_TYPE, default=COMPANY)
+
+    def __str__(self):
+        return f'{self.full_name}'
+
+    class Meta:
+        verbose_name = 'Клиент'
+        verbose_name_plural = 'Клиенты'

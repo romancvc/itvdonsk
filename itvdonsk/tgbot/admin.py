@@ -7,3 +7,5 @@ from .models import TgEvent
 class EventAdmin(admin.ModelAdmin):
     list_display = ('event_number', 'client', 'event_topic')
 
+
+
