@@ -37,3 +37,17 @@ class TgEvent(models.Model):
     class Meta:
         verbose_name = 'Заявка'
         verbose_name_plural = 'Заявки'
+
+class TgUser(models.Model):
+    external_id = models.PositiveIntegerField(verbose_name='ID пользователя в Telegram', unique=True, primary_key=True)
+    nickname = models.CharField(verbose_name='Имя пользователя', max_length=32)
+    company = models.ForeignKey(Client, on_delete=models.SET_NULL,
+                                verbose_name='Компания', blank=True,
+                                null=True)
+
+    def __str__(self):
+        return f'#{self.external_id} {self.nickname} {self.company}'
+
+    class Meta:
+        verbose_name = 'Пользователь телеграм'
+        verbose_name_plural = 'Пользователи телеграм'

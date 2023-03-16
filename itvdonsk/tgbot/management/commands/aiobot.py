@@ -12,8 +12,8 @@ from data_one_c.models import Client
 from tgbot.models import TgEvent
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from .constants import *
-
+from .messages import *
+from .keyboards import *
 
 storage = MemoryStorage()
 bot = Bot(settings.TG_TOKEN)
@@ -25,6 +25,25 @@ r = sr.Recognizer()
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
+
+        @dp.message_handler(commands=['start'])
+        async def cmd_start(message: types.Message) -> None:
+            await message.answer(text_cmd_start,
+                                 reply_markup=start_keyboard(), parse_mode="HTML")
+
+        @dp.callback_query_handler(lambda c: c.data == 'without_authorization')
+        async def process_without_authorization(callback_query: types.CallbackQuery):
+            await bot.answer_callback_query(callback_query.id)
+            await bot.send_message(callback_query.from_user.id, text_process_without_authorization1)
+            await bot.send_message(callback_query.from_user.id, text_process_without_authorization2,
+                                                                parse_mode="HTML",
+                                                                reply_markup=authorization_kb())
+
+        @dp.callback_query_handler(lambda c: c.data == 'authorization')
+        async def process_authorization(callback_query: types.CallbackQuery):
+            await bot.answer_callback_query(callback_query.id)
+            await bot.send_message(callback_query.from_user.id, text_process_authorization)
+
 
         """
         Функция преобразования голосового сообщения в текст

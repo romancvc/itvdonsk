@@ -22,6 +22,8 @@ class Client(models.Model):
                               unique=True, null=True, blank=True)
     status = models.CharField(verbose_name='Тип пользователя', max_length=50,
                               choices=USER_TYPE, default=COMPANY)
+    tg_password = models.CharField(verbose_name='Пароль для авторизации в телеграм',
+                                   null=True, blank=True, max_length=19)
 
     def __str__(self):
         return f'{self.full_name}'

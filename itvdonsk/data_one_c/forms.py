@@ -11,6 +11,7 @@ class ClientForm(forms.ModelForm):
             'full_name',
             'INN',
             'status',
+
         )
         widgets = {
             'full_name': forms.TextInput,
