@@ -19,4 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('data_one_c.urls')),
+    path('', include('tgbot.urls')),
 ]
