@@ -1,6 +1,7 @@
 import os
 import uuid
 from pathlib import Path
+import asyncpg
 
 from aiogram import executor, Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage

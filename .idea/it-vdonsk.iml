@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/itvdonsk" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/itvdonsk/tgbot/management/commands/ready" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/itvdonsk/tgbot/management/commands/voice" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/telegram_async_bot" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
     </content>
     <orderEntry type="inheritedJdk" />
