@@ -81,6 +81,7 @@ async def process_without_authorization(callback_query: types.CallbackQuery, sta
 async def process_authorization_start(callback_query: types.CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(callback_query.id)
     await bot.send_message(callback_query.from_user.id, text_process_authorization)
+    await bot.send_contact(callback_query.from_user.id, phone_number='+7(938)146-41-00', first_name='ООО "Бизнес решения"')
     await UserStates.enter_password.set()
 
 
@@ -142,12 +143,11 @@ async def voice_to_text(message: types.Message, state: FSMContext):
     voice = await message.voice.get_file()
     path = 'C:/Users/Professional/itvdonsk2/telegram_async_bot/voice/'
     await handle_file(file=voice, file_name=f'{voice.file_id}.ogg', path=path)
-
     voice_name_full = "C:/Users/Professional/itvdonsk2/telegram_async_bot/voice/" + voice.file_id + ".ogg"
     voice_name_full_converted = "C:/Users/Professional/itvdonsk2/telegram_async_bot/ready/" + voice.file_id + ".wav"
     check_call(['ffmpeg', '-i', voice_name_full, voice_name_full_converted], stdout=DEVNULL, stderr=STDOUT)
-    # os.system("ffmpeg -i " + voice_name_full + " " + voice_name_full_converted)
     text = recognise(voice_name_full_converted)
+
     if text == ERROR_RECOGNISE:
         await message.answer(text)
     else:
