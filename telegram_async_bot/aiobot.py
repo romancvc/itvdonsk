@@ -55,16 +55,19 @@ async def cmd_start(message: types.Message) -> None:
     if result:
         await message.answer(text_cmd_start,
                              reply_markup=start_keyboard(), parse_mode="HTML")
+        return
     else:
         if result2:
             await message.answer(text_cmd_start_with_authorization, parse_mode="HTML")
             await UserStates.submit_request.set()
+            return
         else:
             await message.answer('Вы не авторизованы. Нажмите кнопку ниже, чтобы авторизоваться.',
                                  reply_markup=start_keyboard(), parse_mode="HTML")
+            return
 
 
-@dp.callback_query_handler(lambda c: c.data == 'without_authorization')
+@dp.callback_query_handler(lambda c: c.data == 'without_authorization', state='*')
 async def process_without_authorization(callback_query: types.CallbackQuery, state: FSMContext):
     await bot.answer_callback_query(callback_query.id)
     await state.set_state(UserStates.submit_request)
@@ -130,7 +133,7 @@ async def handle_file(file: types.File, file_name: str, path: str):
 
 
 async def anti_flood(message: types.Message, state: FSMContext, *args, **kwargs):
-    await message.answer(f'Вы уже оставили заявку. Следующую заявку можно оставить не раньше, чем через час!\n\n'
+    await message.answer(f'Вы уже оставили заявку. Следующую заявку можно оставить не раньше, чем через {remaining_time}!\n\n'
                          f'Для выхода в главное меню введите или нажмите 👉🏻 /start')
     await state.finish()
 
@@ -138,7 +141,7 @@ async def anti_flood(message: types.Message, state: FSMContext, *args, **kwargs)
 @dp.message_handler(content_types=['voice'], state=UserStates.submit_request)
 @dp.throttled(anti_flood, rate=3600)
 async def voice_to_text(message: types.Message, state: FSMContext):
-    global chat_id
+    global chat_id, start_anti_flood_time
     chat_id=message.chat.id
     voice = await message.voice.get_file()
     path = 'C:/Users/Professional/itvdonsk2/telegram_async_bot/voice/'
