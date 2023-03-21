@@ -4,6 +4,8 @@ from datetime import datetime
 import asyncpg
 
 
+next_numb = ''
+
 async def run_connect():
     global conn
     conn = await asyncpg.connect(user='postgres', password='21761815',
@@ -12,6 +14,7 @@ async def run_connect():
 
 
 async def event_numb_generator():
+    global next_numb
     await run_connect()
     events = await conn.fetch(f"SELECT event_number FROM tgbot_tgevent")
     base_numb = 1
@@ -37,8 +40,8 @@ async def cmd_start_db(chat_id, username):
 
 async def check_authorization_bd(chat_id):
     await run_connect()
-    check = await conn.fetch(f"SELECT company_id FROM tgbot_tguser WHERE external_id='{str(chat_id)}'")
-    if 'None' in str(check):
+    check = await conn.fetchval(f"SELECT company_id FROM tgbot_tguser WHERE external_id='{str(chat_id)}'")
+    if check is None:
         return False
     else:
         return True
@@ -48,26 +51,29 @@ async def process_authorization_db(text, chat_id):
     await run_connect()
     all_passwords = await conn.fetch(f"SELECT tg_password FROM data_one_c_client")
     if str(text) in str(all_passwords):
-        this_company = await conn.fetch(f"SELECT id FROM data_one_c_client WHERE tg_password='{str(text)}'")
+        this_company = await conn.fetchval(f"SELECT full_name FROM data_one_c_client WHERE tg_password='{str(text)}'")
         await conn.execute(f"UPDATE tgbot_tguser SET company_id=(SELECT id FROM data_one_c_client WHERE "
                            f"tg_password='{str(text)}') WHERE external_id='{str(chat_id)}'")
-        return True
-    else:
-        return False
+        return this_company
 
 
-async def voice_to_text_db(chat_id, text):
+async def voice_to_text_db(chat_id, text, name_and_number):
     await run_connect()
-    zero_client = await conn.fetch(f"SELECT id FROM data_one_c_client WHERE full_name='Пустой контрагент'")
-    this_client = await conn.fetch(f"SELECT company_id FROM tgbot_tguser WHERE external_id='{str(chat_id)}'")
-    if 'None' in str(this_client):
+    zero_client = await conn.fetchval(f"SELECT id FROM data_one_c_client WHERE full_name='Пустой контрагент'")
+    this_client = await conn.fetchval(f"SELECT company_id FROM tgbot_tguser WHERE external_id='{str(chat_id)}'")
+    if this_client is None:
         await conn.execute(f"INSERT INTO tgbot_tgevent VALUES ('{uuid.uuid4()}','{await event_numb_generator()}',"
-                           f"'{datetime.now()}','Заявка из телеграма {await event_numb_generator()}','{text}', "
+                           f"'{datetime.now()}','Заявка из телеграма {await event_numb_generator()}','{name_and_number}. {text}', "
                            f"(SELECT id FROM data_one_c_client WHERE full_name='Пустой контрагент'))")
-        return True
+        this_event = await conn.fetchval(f"SELECT event_number FROM tgbot_tgevent WHERE event_number='{str(next_numb)}'")
+        return this_event
     else:
         await conn.execute(f"INSERT INTO tgbot_tgevent VALUES ('{uuid.uuid4()}','{await event_numb_generator()}',"
                            f"'{datetime.now()}','Заявка из телеграма {await event_numb_generator()}','{text}', "
                            f"(SELECT company_id FROM tgbot_tguser WHERE external_id='{str(chat_id)}'))")
-        return False
+        this_event = await conn.fetchval(f"SELECT event_number FROM tgbot_tgevent WHERE event_number='{str(next_numb)}'")
+        return this_event
+
+async def get_number_tgevent():
+    await run_connect()
 

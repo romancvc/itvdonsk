@@ -9,6 +9,7 @@ def authorization_kb() -> InlineKeyboardMarkup:
 
     return kb
 
+
 def start_keyboard() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(resize_keyboard=True)
     kb.add(InlineKeyboardButton('Авторизация', callback_data='authorization'))
@@ -16,8 +17,16 @@ def start_keyboard() -> InlineKeyboardMarkup:
 
     return kb
 
+
 def submit_req() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(resize_keyboard=True)
     kb.add(InlineKeyboardButton('Оставить заявку', callback_data='submitreq'))
+
+    return kb
+
+
+def get_password_kb() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(resize_keyboard=True)
+    kb.add(InlineKeyboardButton('У меня нет пароля', callback_data='get_password'))
 
     return kb
